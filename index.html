@@ -131,7 +131,7 @@
     <script type="importmap">
     {
       "imports": {
-        "@google/genai": "https://esm.sh/@google/genai@1.40.0"
+        "@google/genai": "https://esm.sh/@google/genai@0.1.0"
       }
     }
     </script>
@@ -210,7 +210,6 @@
         };
 
         const getAslanResponse = async (userPrompt) => {
-            // Verifica se a chave de API está presente. 
             // Na Vercel, a variável VITE_GEMINI_API_KEY deve ser configurada.
             const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
             if (!apiKey || apiKey === "undefined") {
@@ -223,26 +222,26 @@
             try {
                 const response = await ai.models.generateContent({
                     model: "gemini-3-flash-preview",
-                    contents: userPrompt,
+                    contents: [{ role: 'user', parts: [{ text: userPrompt }] }],
                     config: {
                         systemInstruction: ASLAN_SYSTEM_INSTRUCTION,
-                        temperature: 0.8,
+                        temperature: 0.7,
                     },
                 });
                 
                 return response.text || "O rugido ecoa, mas as vozes se perdem no vento...";
             } catch (error) {
-                console.error('Chat error details:', error);
+                console.error('Erro detalhado do Aslan:', error);
                 
                 if (error.message.includes('429') || error.message.includes('quota')) {
-                    return "As vozes de Nárnia estão em silêncio momentâneo devido a muitos chamados. O ar está gelado e pesado... Aguarde um instante antes de perguntar novamente ao Rei.";
+                    return "As vozes de Nárnia estão em silêncio momentâneo devido a muitos chamados (Limite de Quota). O ar está gelado e pesado... Aguarde um instante antes de perguntar novamente ao Rei.";
                 }
                 
                 if (error.message.includes('API key not valid')) {
-                  return "A chave mágica que abre este guarda-roupa parece inválida. Verifique os segredos da sua API_KEY.";
+                  return "A chave mágica (API_KEY) que abre este guarda-roupa parece inválida. Verifique se copiou a chave corretamente para a Vercel.";
                 }
 
-                return "As neves da Feiticeira Branca estão interferindo em nossa conexão. Tente novamente mais tarde, filho de Adão.";
+                return `As neves da Feiticeira Branca estão interferindo em nossa conexão. (Erro: ${error.message.slice(0, 50)}...)`;
             }
         };
 
