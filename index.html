@@ -211,13 +211,14 @@
 
         const getAslanResponse = async (userPrompt) => {
             // Verifica se a chave de API está presente. 
-            // Na Vercel, o process.env.API_KEY deve ser injetado.
-            if (!process.env.API_KEY || process.env.API_KEY === "undefined") {
-              console.error("API_KEY não encontrada no process.env");
-              return "As estrelas de Nárnia ainda não se alinharam para que eu possa falar. Verifique se o selo da chave real foi colocado corretamente nas configurações.";
+            // Na Vercel, a variável VITE_GEMINI_API_KEY deve ser configurada.
+            const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+            if (!apiKey || apiKey === "undefined") {
+              console.error("VITE_GEMINI_API_KEY não encontrada");
+              return "As estrelas de Nárnia ainda não se alinharam para que eu possa falar. Verifique se a variável VITE_GEMINI_API_KEY foi configurada corretamente na Vercel.";
             }
 
-            const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+            const ai = new GoogleGenAI({ apiKey: apiKey });
             
             try {
                 const response = await ai.models.generateContent({
